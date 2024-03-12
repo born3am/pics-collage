@@ -43,4 +43,6 @@ After running the script, you will find two output files in the project director
 
 - `collage.png`: This is a PNG file of the image collage. This file is only generated if `saveCollageToFile` is set to `true` in `config.js`. You can open this file in any image viewer to view the collage.
 
+![Collage Image](collage.png)
+
 Please note that the output files will overwrite any existing files with the same names in the project directory.
