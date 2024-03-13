@@ -1,25 +1,25 @@
 const settings = {
-  containerWidth: 1200,
-  containerHeight: 800,
+  assetsFolderPath: './src/assets',
+  containerWidth: 3840,
+  containerHeight: 2160,
+  columns: 24,
+  exportedFileQuality: 100,
+  gridGap: '0px',
   htmlFile: 'collage.html',
   jpegFile: 'collage.jpeg',
-  picsToDisplay:638,
-  assetsFolderPath: './src/assets',
-  gridGap: '2px',
   randomizePics: true,
   saveCollageToFile: true,
-  exportedFileQuality: 50
 };
 
 export const { 
-  assetsFolderPath,
-  exportedFileQuality,
+  assetsFolderPath, 
   containerHeight, 
   containerWidth,
+  columns,
+  exportedFileQuality,
+  gridGap,
   htmlFile,
   jpegFile,
-  gridGap,
-  picsToDisplay, 
   randomizePics, 
-  saveCollageToFile 
+  saveCollageToFile,
 } = settings;
