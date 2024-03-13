@@ -2,20 +2,22 @@ const settings = {
   containerWidth: 1200,
   containerHeight: 800,
   htmlFile: 'collage.html',
-  pngFile: 'collage.png',
+  jpegFile: 'collage.jpeg',
   picsToDisplay:638,
   assetsFolderPath: './src/assets',
   gridGap: '2px',
   randomizePics: true,
-  saveCollageToFile: true
+  saveCollageToFile: true,
+  exportedFileQuality: 50
 };
 
 export const { 
-  assetsFolderPath, 
+  assetsFolderPath,
+  exportedFileQuality,
   containerHeight, 
   containerWidth,
   htmlFile,
-  pngFile,
+  jpegFile,
   gridGap,
   picsToDisplay, 
   randomizePics, 

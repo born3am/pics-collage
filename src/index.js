@@ -4,11 +4,12 @@ import puppeteer from 'puppeteer';
 import {fileTypeFromBuffer} from 'file-type';
 
 import {
-  assetsFolderPath, 
+  assetsFolderPath,
+  exportedFileQuality, 
   containerHeight, 
   containerWidth,
   htmlFile,
-  pngFile,
+  jpegFile,
   gridGap,
   picsToDisplay, 
   randomizePics, 
@@ -86,8 +87,7 @@ async function generateCollage(assetsFolderPath, targetCount, containerWidth, co
     const page = await browser.newPage();
     await page.goto(`file://${path.join(process.cwd(), htmlFile)}`); // navigate to the page
     const element = await page.$('.grid'); // get the element
-    await element.screenshot({path: pngFile, omitBackground: false});
-    await browser.close();
+    await element.screenshot({path: jpegFile, type: 'jpeg', quality: exportedFileQuality, omitBackground: false});    await browser.close();
   }
 } catch (error) {
   console.error(`Failed to generate collage: ${error}`);
