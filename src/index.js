@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import puppeteer from 'puppeteer';
-import { exec } from 'child_process';
+import { promisify } from 'util';
+import convert from 'heic-convert';
 
 import {
   assetsFolderPath,
@@ -16,20 +17,16 @@ import {
   saveCollageToFile 
   } from './config.js';
   
-// Add the path to the convert command to the PATH
-process.env.PATH = process.env.PATH + ':/usr/local/bin';
-
-function convertHeicToJpeg(heicFilePath, jpegFilePath) {
-  return new Promise((resolve, reject) => {
-    exec(`convert ${heicFilePath} ${jpegFilePath}`, (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve();
-      }
+  async function convertHeicToJpeg(heicFilePath, jpegFilePath) {
+    const inputBuffer = await promisify(fs.readFile)(heicFilePath);
+    const outputBuffer = await convert({
+      buffer: inputBuffer, // the HEIC file buffer
+      format: 'JPEG',      // output format
+      quality: 1           // the jpeg compression quality, between 0 and 1
     });
-  });
-}
+  
+    await promisify(fs.writeFile)(jpegFilePath, outputBuffer);
+  }
 
 function repeatImages(images, targetCount) {
   const repeatedImages = [];
@@ -47,13 +44,21 @@ async function generateCollage(assetsFolderPath, targetColumns, containerWidth, 
   try {
     let files = fs.readdirSync(assetsFolderPath);
     let images = [];
+    const heicFolderPath = path.join(assetsFolderPath, 'heic');
+    if (!fs.existsSync(heicFolderPath)) {
+      fs.mkdirSync(heicFolderPath);
+    }
     for (let file of files) {
       const filePath = path.join(assetsFolderPath, file);
       const ext = path.extname(filePath).toLowerCase();
       if (ext === '.heic') {
         const jpegFilePath = path.join(assetsFolderPath, `${path.basename(file, '.heic')}.jpeg`);
         await convertHeicToJpeg(filePath, jpegFilePath);
-        images.push(`${path.basename(file, '.heic')}.jpeg`);
+        const convertedFilePath = path.join(assetsFolderPath, `${path.basename(file, '.heic')}.converted.jpeg`);
+        fs.renameSync(jpegFilePath, convertedFilePath);
+        images.push(`${path.basename(file, '.heic')}.converted.jpeg`);
+        const newHeicFilePath = path.join(heicFolderPath, file);
+        fs.renameSync(filePath, newHeicFilePath);
       } else if (ext === '.jpg' || ext === '.jpeg' || ext === '.png' || ext === '.gif') {
         images.push(file);
       }
