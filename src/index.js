@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import puppeteer from 'puppeteer';
-import {fileTypeFromBuffer} from 'file-type';
+import { exec } from 'child_process';
 
 import {
   assetsFolderPath,
@@ -16,6 +16,21 @@ import {
   saveCollageToFile 
   } from './config.js';
   
+// Add the path to the convert command to the PATH
+process.env.PATH = process.env.PATH + ':/usr/local/bin';
+
+function convertHeicToJpeg(heicFilePath, jpegFilePath) {
+  return new Promise((resolve, reject) => {
+    exec(`convert ${heicFilePath} ${jpegFilePath}`, (error) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve();
+      }
+    });
+  });
+}
+
 function repeatImages(images, targetCount) {
   const repeatedImages = [];
   while (repeatedImages.length < targetCount) {
@@ -34,12 +49,16 @@ async function generateCollage(assetsFolderPath, targetColumns, containerWidth, 
     let images = [];
     for (let file of files) {
       const filePath = path.join(assetsFolderPath, file);
-      const buffer = fs.readFileSync(filePath);
-      const type = await fileTypeFromBuffer(buffer);
-      if (type && type.mime.startsWith('image/')) {
+      const ext = path.extname(filePath).toLowerCase();
+      if (ext === '.heic') {
+        const jpegFilePath = path.join(assetsFolderPath, `${path.basename(file, '.heic')}.jpeg`);
+        await convertHeicToJpeg(filePath, jpegFilePath);
+        images.push(`${path.basename(file, '.heic')}.jpeg`);
+      } else if (ext === '.jpg' || ext === '.jpeg' || ext === '.png' || ext === '.gif') {
         images.push(file);
       }
     }
+
     if (randomizePics) {
       images = randomizeOrder(images);
     }
