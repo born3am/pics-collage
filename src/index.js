@@ -40,6 +40,11 @@ function randomizeOrder(images) {
   return images.sort(() => Math.random() - 0.5);
 }
 
+function getImages(images, targetCount, doRandomizeOrder) {
+  const repeatedImages = images.length >= targetCount ? images : repeatImages(images, targetCount);
+  return doRandomizeOrder ? randomizeOrder(repeatedImages) : repeatedImages;
+}
+
 async function generateCollage(assetsFolderPath, targetColumns, containerWidth, containerHeight, randomizePics, enablePuppeteer) {
   try {
     let files = fs.readdirSync(assetsFolderPath);
@@ -64,10 +69,6 @@ async function generateCollage(assetsFolderPath, targetColumns, containerWidth, 
       }
     }
 
-    if (randomizePics) {
-      images = randomizeOrder(images);
-    }
-
     const imageSize = containerWidth / targetColumns;
     console.log(`Calculated tile size: ${imageSize}px`)
     const rowCount = Math.ceil(containerHeight / imageSize);
@@ -75,7 +76,7 @@ async function generateCollage(assetsFolderPath, targetColumns, containerWidth, 
     const targetCount = targetColumns * rowCount;
     console.log(`Calculated target count: ${targetCount}`)
 
-    const repeatedImages = images.length >= targetCount ? images : repeatImages(images, targetCount);
+    const repeatedImages = getImages(images, targetCount, randomizePics);
 
     const html = `
       <!DOCTYPE html>
